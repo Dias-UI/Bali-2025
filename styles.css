@@ -793,6 +793,12 @@ body {
     display: flex;
     gap: 1.5rem;
     justify-content: center;
+    flex-wrap: wrap;
+}
+
+.beach-experience img {
+    max-width: 100%;
+    width: 450px;
 }
 
 .temple-visit {
