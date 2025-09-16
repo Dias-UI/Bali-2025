@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Expenses - Bali Trip 2025</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">Bali Adventure</div>
+            <div class="nav-links-right">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="#expenses" class="nav-link active">Expenses</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Expenses Header -->
+    <section class="expenses-header">
+        <div class="container">
+            <h1>Travel Expenses</h1>
+            <p>Complete breakdown of our Bali adventure costs</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="expenses-content">
+        <div class="container">
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Total Spent</h3>
+                        <p class="amount" id="total-amount">$0.00</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Paid Back to Me</h3>
+                        <p class="amount" id="paid-back-amount">$0.00</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Trip Duration</h3>
+                        <p class="amount">8 Days</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Transactions</h3>
+                        <p class="amount" id="transaction-count">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Tabs -->
+            <div class="chart-section">
+                <div class="chart-tabs">
+                    <button class="tab-button active" data-tab="category">By Category</button>
+                    <button class="tab-button" data-tab="daily">By Day</button>
+                    <button class="tab-button" data-tab="currency">By Currency</button>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <div class="filter-row">
+                    <span class="filter-label">Categories:</span>
+                    <div class="filter-buttons" id="category-filters">
+                        <!-- Category buttons will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <span class="filter-label">Days:</span>
+                    <div class="filter-buttons" id="day-filters">
+                        <!-- Day buttons will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button id="reset-filters" class="btn-primary">Reset Filters</button>
+                    <button id="export-csv" class="btn-primary">Export CSV</button>
+                </div>
+            </div>
+
+            <!-- Expenses Table -->
+            <div class="expenses-table-container">
+                <div class="expenses-table-header">
+                    <h2>Detailed Expenses</h2>
+                    <div class="table-summary">
+                        <div class="summary-item">Total Displayed: <span id="displayed-total">$0.00</span></div>
+                        <div class="summary-item">My Share: <span id="my-share-total">$0.00</span></div>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="expenses-table" id="expenses-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Currency</th>
+                                <th>USD Amount</th>
+                                <th>Shared</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-tbody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="expenses.js"></script>
+</body>
+</html>
