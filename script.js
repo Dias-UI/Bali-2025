@@ -163,9 +163,6 @@ function initHeroEffects() {
 
 // Setup hero image with lazy loading and blur-up effect
 function setupHeroImage(img) {
-    // Add blur effect initially
-    img.style.filter = 'blur(2px)';
-    img.style.transition = 'filter 0.3s ease';
     
     // Store full resolution source
     const fullResSrc = img.src.replace('compressed/webp/', '').replace('.webp', '.jpg');
@@ -174,8 +171,7 @@ function setupHeroImage(img) {
     // Create a new image to preload the full resolution
     const fullResImg = new Image();
     fullResImg.onload = function() {
-        // When full res image loads, remove blur
-        img.style.filter = 'none';
+        // When full res image loads
         img.classList.add('loaded');
         
         // Update the image source to the full resolution
@@ -210,9 +206,6 @@ function setupLazyImage(img) {
     const isCompressed = img.src.includes('compressed/');
     
     if (isCompressed) {
-        // Add blur effect for compressed images
-        img.style.filter = 'blur(2px)';
-        img.style.transition = 'filter 0.3s ease';
         
         // Store full resolution source
         const fullResSrc = img.src.replace('compressed/webp/', '').replace('.webp', '.jpg');
@@ -221,8 +214,7 @@ function setupLazyImage(img) {
         // Create a new image to preload the full resolution
         const fullResImg = new Image();
         fullResImg.onload = function() {
-            // When full res image loads, remove blur and update src
-            img.style.filter = 'none';
+            // When full res image loads, update src
             img.classList.add('loaded');
             img.src = fullResSrc;
         };
@@ -241,13 +233,8 @@ function setupLazyImage(img) {
         
         imageObserver.observe(img);
     } else {
-        // For non-compressed images, use the existing blur technique
+        // For non-compressed images, use the existing technique
         const originalSrc = img.src;
-        
-        // Create thumbnail version by adding a query parameter or using a smaller version
-        // For now, we'll use CSS to create a lower quality initial load
-        img.style.filter = 'blur(2px)';
-        img.style.transition = 'filter 0.3s ease';
         
         // Store full resolution source
         // For webp compressed images, convert back to jpg
@@ -256,10 +243,10 @@ function setupLazyImage(img) {
             originalSrc;
         img.dataset.fullres = fullResSrc;
         
+        
         // Create a new image to preload the full resolution
         const fullResImg = new Image();
         fullResImg.onload = function() {
-            img.style.filter = 'none';
             img.classList.add('loaded');
         };
         
