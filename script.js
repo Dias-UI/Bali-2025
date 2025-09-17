@@ -22,7 +22,7 @@ function initNavbar() {
         }
         
         // Update active nav link based on scroll position
-        updateActiveNavLink();
+        updateActiveNavLink(); 
     });
 }
 
@@ -156,18 +156,56 @@ function initHeroEffects() {
     }
 }
 
-// Photo gallery lightbox functionality
+// Photo gallery with lazy loading and lightbox functionality
 function initPhotoGallery() {
     const photos = document.querySelectorAll('.clickable-image, .day-timeline-image');
     
     photos.forEach(photo => {
+        // Set up lazy loading with thumbnails
+        setupLazyImage(photo);
+        
         photo.addEventListener('click', function() {
-            createLightbox(this.src, this.alt);
+            const fullResSrc = this.dataset.fullres || this.src;
+            createLightbox(fullResSrc, this.alt);
         });
     });
 }
 
-// Create lightbox for photo viewing
+// Setup lazy loading for images with thumbnail support
+function setupLazyImage(img) {
+    const originalSrc = img.src;
+    
+    // Create thumbnail version by adding a query parameter or using a smaller version
+    // For now, we'll use CSS to create a lower quality initial load
+    img.style.filter = 'blur(2px)';
+    img.style.transition = 'filter 0.3s ease';
+    
+    // Store full resolution source
+    img.dataset.fullres = originalSrc;
+    
+    // Create a new image to preload the full resolution
+    const fullResImg = new Image();
+    fullResImg.onload = function() {
+        img.style.filter = 'none';
+        img.classList.add('loaded');
+    };
+    
+    // Use Intersection Observer to load full resolution when image comes into view
+    const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                fullResImg.src = originalSrc;
+                imageObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        rootMargin: '50px'
+    });
+    
+    imageObserver.observe(img);
+}
+
+// Create lightbox for photo viewing with full resolution loading
 function createLightbox(src, alt) {
     // Remove existing lightbox if any
     const existingLightbox = document.querySelector('.lightbox');
@@ -179,7 +217,8 @@ function createLightbox(src, alt) {
     lightbox.className = 'lightbox';
     lightbox.innerHTML = `
         <div class="lightbox-content">
-            <img src="${src}" alt="${alt}">
+            <div class="lightbox-loading">Loading...</div>
+            <img class="lightbox-image" style="display: none;" alt="${alt}">
             <button class="lightbox-close">&times;</button>
         </div>
     `;
@@ -188,6 +227,17 @@ function createLightbox(src, alt) {
     
     // Prevent body scroll when lightbox is open
     document.body.style.overflow = 'hidden';
+    
+    // Load full resolution image
+    const lightboxImg = lightbox.querySelector('.lightbox-image');
+    const loadingDiv = lightbox.querySelector('.lightbox-loading');
+    
+    lightboxImg.onload = function() {
+        loadingDiv.style.display = 'none';
+        lightboxImg.style.display = 'block';
+    };
+    
+    lightboxImg.src = src;
     
     // Animate in
     setTimeout(() => {
@@ -209,9 +259,9 @@ function createLightbox(src, alt) {
     const closeBtn = lightbox.querySelector('.lightbox-close');
     closeBtn.addEventListener('click', closeLightbox);
     
-    // Click outside to close
+    // Click outside to close (including clicking on the lightbox background)
     lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) {
+        if (e.target === lightbox || e.target === lightbox.querySelector('.lightbox-content')) {
             closeLightbox();
         }
     });
@@ -365,7 +415,7 @@ function initPhotoAnimations() {
         photos.forEach(photo => {
             photo.style.opacity = '0';
             photo.style.transform = 'translateY(20px)';
-            photo.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            photo.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
         });
         photoObserver.observe(row);
     });
@@ -374,144 +424,10 @@ function initPhotoAnimations() {
 // Initialize photo animations
 document.addEventListener('DOMContentLoaded', initPhotoAnimations);
 
-// Update active navigation link based on current section
-function updateActiveNavLink() {
-    const sections = document.querySelectorAll('section[id], main[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    let current = 'home'; // default
-    
-    sections.forEach(section => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= 100 && rect.bottom >= 100) {
-            current = section.id;
-        }
-    });
-    
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').includes(current)) {
-            link.classList.add('active');
-        }
-    });
-}
-
-// Enhanced photo gallery lightbox functionality
-function initEnhancedPhotoGallery() {
-    const clickableImages = document.querySelectorAll('.clickable-image, .day-timeline-image');
-    
-    clickableImages.forEach(photo => {
-        photo.addEventListener('click', function() {
-            createEnhancedLightbox(this.src, this.alt);
-        });
-    });
-}
-
-// Create enhanced lightbox for photo viewing
-function createEnhancedLightbox(src, alt) {
-    // Remove existing lightbox if any
-    const existingLightbox = document.querySelector('.lightbox');
-    if (existingLightbox) {
-        existingLightbox.remove();
-    }
-    
-    const lightbox = document.createElement('div');
-    lightbox.className = 'lightbox';
-    lightbox.innerHTML = `
-        <div class="lightbox-content">
-            <img src="${src}" alt="${alt}">
-            <button class="lightbox-close">&times;</button>
-        </div>
-    `;
-    
-    document.body.appendChild(lightbox);
-    
-    // Prevent body scroll when lightbox is open
-    document.body.style.overflow = 'hidden';
-    
-    // Animate in
-    setTimeout(() => {
-        lightbox.classList.add('show');
-    }, 10);
-    
-    // Close functionality
-    function closeLightbox() {
-        lightbox.classList.remove('show');
-        document.body.style.overflow = '';
-        setTimeout(() => {
-            if (lightbox.parentNode) {
-                lightbox.parentNode.removeChild(lightbox);
-            }
-        }, 300);
-    }
-    
-    // Close button
-    const closeBtn = lightbox.querySelector('.lightbox-close');
-    closeBtn.addEventListener('click', closeLightbox);
-    
-    // Click outside to close
-    lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) {
-            closeLightbox();
-        }
-    });
-    
-    // Close on escape key
-    const escapeHandler = function(e) {
-        if (e.key === 'Escape') {
-            closeLightbox();
-            document.removeEventListener('keydown', escapeHandler);
-        }
-    };
-    document.addEventListener('keydown', escapeHandler);
-}
-
-// Initialize enhanced photo gallery when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initEnhancedPhotoGallery();
-});
-
-// Utility function to throttle scroll events
-function throttle(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
 // Apply throttling to scroll-heavy functions
 window.addEventListener('scroll', throttle(function() {
     // Any additional scroll-based functionality can be added here
 }, 16)); // ~60fps
-
-// Loading animation
-window.addEventListener('load', function() {
-    document.body.classList.add('loaded');
-    
-    // Trigger initial animations
-    const heroContent = document.querySelector('.hero-content');
-    if (heroContent) {
-        heroContent.style.animation = 'fadeInUp 1s ease-out';
-    }
-});
-
-// Responsive navigation toggle for mobile (if needed)
-function initMobileNav() {
-    const navToggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (navToggle && navLinks) {
-        navToggle.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-            this.classList.toggle('active');
-        });
-    }
-}
 
 // Error handling for missing images
 document.addEventListener('DOMContentLoaded', function() {
@@ -530,24 +446,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-// Performance optimization: Lazy loading for images
-function initLazyLoading() {
-    const images = document.querySelectorAll('img[data-src]');
-    
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.classList.remove('lazy');
-                imageObserver.unobserve(img);
-            }
-        });
-    });
-    
-    images.forEach(img => imageObserver.observe(img));
-}
-
-// Initialize lazy loading if data-src attributes are present
-document.addEventListener('DOMContentLoaded', initLazyLoading);
