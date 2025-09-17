@@ -1670,6 +1670,17 @@ body {
 }
 
 @media (max-width: 768px) {
+    .hero-banner {
+        height: 60vh;
+        min-height: 400px;
+    }
+    
+    .main-content {
+        margin-top: 0;
+        position: relative;
+        z-index: 10;
+    }
+    
     .hero-title {
         font-size: 2.5rem;
     }
@@ -1698,158 +1709,58 @@ body {
     
     .daily-entries-container {
         padding: 1rem 15px;
+        /* Remove min-height and visibility properties that might cause issues */
     }
     
     .day-entry {
+        /* Ensure visibility and display */
+        display: block;
+        visibility: visible;
+        opacity: 1;
+        height: auto;
+        overflow: visible;
         padding: 1.5rem;
         margin-bottom: 2rem;
     }
-    
-    .day-title {
-        font-size: 1.5rem;
+
+    .fade-in-section {
+        /* Ensure sections are visible by default on mobile */
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .fade-in-section.visible {
+        opacity: 1;
+        transform: none;
     }
     
-    .day-header {
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-    }
-    
-    .photo-row,
-    .photo-cluster,
-    .photo-grid {
-        flex-direction: column;
-        align-items: center;
-        grid-template-columns: 1fr;
-    }
-    
-    .story-photo.landscape,
-    .story-photo.portrait {
-        width: 100%;
-        max-width: 300px;
-        height: auto;
-    }
-    
-    .text-with-feature-photo {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .feature-photo {
-        flex: none;
-        display: flex;
-        justify-content: center;
-    }
-    
-    .inline-photo {
-        float: none;
-        margin: 1rem auto;
+    .daily-entries-container {
+        padding: 1rem 15px;
+        /* Remove properties that might affect visibility */
+        min-height: auto;
         display: block;
     }
-    
-    .content-block {
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .coffee-list {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .photo-gallery {
-        grid-template-columns: 1fr;
-    }
-    
-    .summary-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .chart-tabs {
+
+    .day-content-layout {
+        display: flex;
         flex-direction: column;
-        gap: 0;
+        visibility: visible;
+        opacity: 1;
     }
-    
-    .tab-button {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid #eee;
-        border-radius: 0;
+
+    .day-content-main {
+        visibility: visible;
+        opacity: 1;
     }
-    
-    .filter-controls {
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-    }
-    
-    .filter-buttons {
-        gap: 0.5rem;
-    }
-    
-    .filter-btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
-    }
-    
-    .filter-actions {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .btn-primary {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.95rem;
-    }
-    
-    .expenses-table-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .table-summary {
-        flex-direction: column;
-        gap: 0.75rem;
-        width: 100%;
-    }
-    
-    .summary-item {
-        font-size: 1rem;
-        padding: 0.4rem 0.8rem;
-    }
-    
-    .lightbox-close {
-        top: -30px;
-        right: -30px;
-        width: 30px;
-        height: 30px;
-        font-size: 18px;
+
+    .story-section {
+        visibility: visible;
+        opacity: 1;
     }
 }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 0 15px;
-    }
-    
-    .timeline-container {
-        padding: 1rem 15px;
-    }
-    
-    .hero-title {
-        font-size: 2rem;
-    }
-    
-    .expenses-header h1 {
-        font-size: 2rem;
-    }
-    
-    .day-entry {
-        padding: 1rem;
-    }
-    
-    .chart-container {
-        height: 300px;
-    }
-}
+/* ...existing code... */
 
 /* Print Styles */
 @media print {
