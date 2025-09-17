@@ -130,6 +130,11 @@ function initHeroEffects() {
     const heroImage = document.querySelector('.hero-image');
     const heroContent = document.querySelector('.hero-content');
     
+    // Setup lazy loading for hero image
+    if (heroImage) {
+        setupHeroImage(heroImage);
+    }
+    
     // Fade out hero image and content as user scrolls
     window.addEventListener('scroll', throttle(function() {
         const scrolled = window.pageYOffset;
@@ -156,6 +161,31 @@ function initHeroEffects() {
     }
 }
 
+// Setup hero image with lazy loading and blur-up effect
+function setupHeroImage(img) {
+    // Add blur effect initially
+    img.style.filter = 'blur(2px)';
+    img.style.transition = 'filter 0.3s ease';
+    
+    // Store full resolution source
+    const fullResSrc = img.src.replace('compressed/webp/', '').replace('.webp', '.jpg');
+    img.dataset.fullres = fullResSrc;
+    
+    // Create a new image to preload the full resolution
+    const fullResImg = new Image();
+    fullResImg.onload = function() {
+        // When full res image loads, remove blur
+        img.style.filter = 'none';
+        img.classList.add('loaded');
+        
+        // Update the image source to the full resolution
+        img.src = fullResSrc;
+    };
+    
+    // Start preloading the full resolution image immediately for hero
+    fullResImg.src = fullResSrc;
+}
+
 // Photo gallery with lazy loading and lightbox functionality
 function initPhotoGallery() {
     const photos = document.querySelectorAll('.clickable-image, .day-timeline-image');
@@ -165,7 +195,10 @@ function initPhotoGallery() {
         setupLazyImage(photo);
         
         photo.addEventListener('click', function() {
-            const fullResSrc = this.dataset.fullres || this.src;
+            const fullResSrc = this.dataset.fullres ||
+                (this.src.includes('compressed/webp/') ?
+                    this.src.replace('compressed/webp/', '').replace('.webp', '.jpg') :
+                    this.src.replace('compressed/', ''));
             createLightbox(fullResSrc, this.alt);
         });
     });
@@ -173,36 +206,77 @@ function initPhotoGallery() {
 
 // Setup lazy loading for images with thumbnail support
 function setupLazyImage(img) {
-    const originalSrc = img.src;
+    // Check if this is a compressed image
+    const isCompressed = img.src.includes('compressed/');
     
-    // Create thumbnail version by adding a query parameter or using a smaller version
-    // For now, we'll use CSS to create a lower quality initial load
-    img.style.filter = 'blur(2px)';
-    img.style.transition = 'filter 0.3s ease';
-    
-    // Store full resolution source
-    img.dataset.fullres = originalSrc;
-    
-    // Create a new image to preload the full resolution
-    const fullResImg = new Image();
-    fullResImg.onload = function() {
-        img.style.filter = 'none';
-        img.classList.add('loaded');
-    };
-    
-    // Use Intersection Observer to load full resolution when image comes into view
-    const imageObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                fullResImg.src = originalSrc;
-                imageObserver.unobserve(entry.target);
-            }
+    if (isCompressed) {
+        // Add blur effect for compressed images
+        img.style.filter = 'blur(2px)';
+        img.style.transition = 'filter 0.3s ease';
+        
+        // Store full resolution source
+        const fullResSrc = img.src.replace('compressed/webp/', '').replace('.webp', '.jpg');
+        img.dataset.fullres = fullResSrc;
+        
+        // Create a new image to preload the full resolution
+        const fullResImg = new Image();
+        fullResImg.onload = function() {
+            // When full res image loads, remove blur and update src
+            img.style.filter = 'none';
+            img.classList.add('loaded');
+            img.src = fullResSrc;
+        };
+        
+        // Use Intersection Observer to load full resolution when image comes into view
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    fullResImg.src = fullResSrc;
+                    imageObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            rootMargin: '50px'
         });
-    }, {
-        rootMargin: '50px'
-    });
-    
-    imageObserver.observe(img);
+        
+        imageObserver.observe(img);
+    } else {
+        // For non-compressed images, use the existing blur technique
+        const originalSrc = img.src;
+        
+        // Create thumbnail version by adding a query parameter or using a smaller version
+        // For now, we'll use CSS to create a lower quality initial load
+        img.style.filter = 'blur(2px)';
+        img.style.transition = 'filter 0.3s ease';
+        
+        // Store full resolution source
+        // For webp compressed images, convert back to jpg
+        const fullResSrc = originalSrc.includes('compressed/webp/') ?
+            originalSrc.replace('compressed/webp/', '').replace('.webp', '.jpg') :
+            originalSrc;
+        img.dataset.fullres = fullResSrc;
+        
+        // Create a new image to preload the full resolution
+        const fullResImg = new Image();
+        fullResImg.onload = function() {
+            img.style.filter = 'none';
+            img.classList.add('loaded');
+        };
+        
+        // Use Intersection Observer to load full resolution when image comes into view
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    fullResImg.src = originalSrc;
+                    imageObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            rootMargin: '50px'
+        });
+        
+        imageObserver.observe(img);
+    }
 }
 
 // Create lightbox for photo viewing with full resolution loading
@@ -237,7 +311,11 @@ function createLightbox(src, alt) {
         lightboxImg.style.display = 'block';
     };
     
-    lightboxImg.src = src;
+    // Ensure we're loading the full resolution image
+    const fullResSrc = src.includes('compressed/webp/') ?
+        src.replace('compressed/webp/', '').replace('.webp', '.jpg') :
+        src.includes('compressed/') ? src.replace('compressed/', '') : src;
+    lightboxImg.src = fullResSrc;
     
     // Animate in
     setTimeout(() => {
