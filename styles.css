@@ -1463,7 +1463,7 @@ body {
 .fade-in-section {
     opacity: 0;
     transform: translateY(30px);
-    transition: all 0.8s ease;
+    transition: all 0.5s ease;
 }
 
 .fade-in-section.visible {
@@ -1487,6 +1487,7 @@ body {
     transition: opacity 0.3s ease;
     padding: 20px;
     box-sizing: border-box;
+    cursor: pointer; /* Make entire lightbox clickable */
 }
 
 .lightbox.show {
@@ -1500,9 +1501,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer; /* Make content area clickable too */
 }
 
-.lightbox img {
+.lightbox-image {
     max-width: 100%;
     max-height: 100%;
     width: auto;
@@ -1510,6 +1512,32 @@ body {
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    cursor: default; /* Don't close when clicking on image itself */
+}
+
+.lightbox-loading {
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.lightbox-loading::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .lightbox-close {
@@ -1535,6 +1563,26 @@ body {
 .lightbox-close:hover {
     background: rgba(255, 255, 255, 1);
     transform: scale(1.1);
+}
+
+/* Image loading states */
+.clickable-image {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clickable-image:not(.loaded) {
+    filter: blur(2px);
+}
+
+.clickable-image.loaded {
+    filter: none;
+}
+
+.clickable-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
 }
 
 /* Responsive Design */
