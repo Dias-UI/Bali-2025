@@ -153,9 +153,18 @@ function initializeFilters() {
         categoryFilters.appendChild(button);
     });
     
-    // Populate day filters (excluding "All Days")
-    const dates = [...new Set(expenseData.map(expense => expense.shortDate))].sort();
-    dates.forEach(date => {
+    // Populate day filters with new structure
+    // Button for everything up until Sep 6
+    const beforeSep6Button = document.createElement('button');
+    beforeSep6Button.className = 'filter-btn';
+    beforeSep6Button.dataset.day = 'before-sep-6';
+    beforeSep6Button.textContent = 'Before Sep 6';
+    beforeSep6Button.addEventListener('click', () => filterByDay('before-sep-6'));
+    dayFilters.appendChild(beforeSep6Button);
+    
+    // Individual buttons for each day from Sep 7 to 14
+    const sepDays = ['Sep 7', 'Sep 8', 'Sep 9', 'Sep 10', 'Sep 11', 'Sep 12', 'Sep 13', 'Sep 14'];
+    sepDays.forEach(date => {
         const button = document.createElement('button');
         button.className = 'filter-btn';
         button.dataset.day = date;
@@ -202,7 +211,22 @@ function applyFilters() {
     
     filteredData = expenseData.filter(expense => {
         const categoryMatch = activeCategories.length === 0 || activeCategories.includes(expense.subcategory);
-        const dayMatch = activeDays.length === 0 || activeDays.includes(expense.shortDate);
+        
+        // Handle day filtering with new structure
+        let dayMatch = true;
+        if (activeDays.length > 0) {
+            dayMatch = activeDays.some(dayFilter => {
+                if (dayFilter === 'before-sep-6') {
+                    // Check if date is before Sep 6, 2025
+                    const sep6Date = new Date('2025-09-06');
+                    return expense.parsedDate < sep6Date;
+                } else {
+                    // Check for specific dates from Sep 7-14
+                    return expense.shortDate === dayFilter;
+                }
+            });
+        }
+        
         return categoryMatch && dayMatch;
     });
     
