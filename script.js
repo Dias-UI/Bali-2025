@@ -266,7 +266,7 @@ function setupLazyImage(img) {
     }
 }
 
-// Create lightbox for photo viewing with full resolution loading
+// Update the createLightbox function
 function createLightbox(src, alt) {
     // Remove existing lightbox if any
     const existingLightbox = document.querySelector('.lightbox');
@@ -285,11 +285,8 @@ function createLightbox(src, alt) {
     `;
     
     document.body.appendChild(lightbox);
-    
-    // Prevent body scroll when lightbox is open
     document.body.style.overflow = 'hidden';
     
-    // Load full resolution image
     const lightboxImg = lightbox.querySelector('.lightbox-image');
     const loadingDiv = lightbox.querySelector('.lightbox-loading');
     
@@ -298,10 +295,20 @@ function createLightbox(src, alt) {
         lightboxImg.style.display = 'block';
     };
     
-    // Ensure we're loading the full resolution image
-    const fullResSrc = src.includes('compressed/webp/') ?
-        src.replace('compressed/webp/', '').replace('.webp', '.jpg') :
-        src.includes('compressed/') ? src.replace('compressed/', '') : src;
+    // Fix the path transformation
+    let fullResSrc = src;
+    if (src.includes('compressed/webp/')) {
+        fullResSrc = src.replace('compressed/webp/', '').replace('.webp', '.jpg');
+    } else if (src.includes('compressed/')) {
+        fullResSrc = src.replace('compressed/', '');
+    }
+    
+    // Add error handling
+    lightboxImg.onerror = function() {
+        loadingDiv.textContent = 'Error loading image';
+        console.error('Failed to load image:', fullResSrc);
+    };
+    
     lightboxImg.src = fullResSrc;
     
     // Animate in
@@ -510,4 +517,34 @@ document.addEventListener('DOMContentLoaded', function() {
             this.alt = 'Image placeholder - ' + (this.alt || 'Photo coming soon');
         });
     });
+});
+
+// Add navbar hide/show functionality
+let lastScrollY = window.scrollY;
+let ticking = false;
+
+function updateNavbar() {
+    const navbar = document.querySelector('.navbar');
+    const currentScrollY = window.scrollY;
+    
+    if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        navbar.classList.add('hide');
+    } else {
+        // Scrolling up
+        navbar.classList.remove('hide');
+    }
+    
+    lastScrollY = currentScrollY;
+    ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        window.requestAnimationFrame(() => {
+            updateNavbar();
+            ticking = false;
+        });
+        ticking = true;
+    }
 });
